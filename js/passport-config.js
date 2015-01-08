@@ -44,7 +44,10 @@ function ConfigurePassport() {
                 // represent the logged-in user.  In a typical application, you would want
                 // to associate the Google account with a user record in your database,
                 // and return that user instead.
-                console.log(profile);
+                console.log("accessToken:", accessToken);
+                console.log("refreshToken:", refreshToken);
+                console.log("profile:", profile);
+                profile.token = accessToken;
                 return done(null, profile);
             });
         }

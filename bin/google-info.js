@@ -1,6 +1,6 @@
 function GoogleInfo() {
-    this.GOOGLE_CLIENT_ID = "CLIENT ID GOES HERE";
-    this.GOOGLE_CLIENT_SECRET = "CLIENT SECRET GOES HERE";
+    this.GOOGLE_CLIENT_ID = "630220068318-hmvth59daua2p3je12hn7j2i2h8tgo9k.apps.googleusercontent.com";
+    this.GOOGLE_CLIENT_SECRET = "BSvpx4ZBOJQ5gIBk0eyl_aBw";
 }
 
 /**

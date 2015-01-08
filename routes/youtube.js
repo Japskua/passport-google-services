@@ -7,6 +7,10 @@ var router = express.Router();
 
 /* GET /youtube/ */
 router.get('/', ensureAuthenticated, function(req, res){
+
+    // Try to connect to youtube here
+
+
     res.render('youtube', { user: req.user });
 });
 
