@@ -5,13 +5,12 @@ var express = require('express'),
     router = express.Router(),
     google = require('googleapis'),
     OAuth2 = google.auth.OAuth2,
-    GoogleInfo = require('./../bin/google-info');
+    GoogleInfo = require('./../bin/google-info'),
+    YoutubeManager = require('./../js/youtube-manager');
 
 
 /* GET /youtube/ */
 router.get('/', ensureAuthenticated, function(req, res){
-
-    var googleInfo = new GoogleInfo();
 
     // Try to connect to youtube here
     var plus = google.plus('v1');
@@ -22,16 +21,21 @@ router.get('/', ensureAuthenticated, function(req, res){
         refresh_token : ""
     });
 
-    var youtube = google.youtube('v3');
-    youtube.playlists.list({ part : "snippet", mine : true, auth : oauth2client}, function(err, response) {
-        if (err) {
+    // Set the authentication as global
+    google.options({ auth : oauth2client});
+
+    var youtubeManager = new YoutubeManager();
+    //youtubeManager.MyPlaylists(function(err, result) {
+    //youtubeManager.MyVideos(function(err, result) {
+    youtubeManager.VideosInPlaylist("PLX0jcZ2eQoOa6AISCWiwNAWSlNVVSup5W", function(err, result) {
+        if(err) {
             console.log(err);
             res.send(err);
+        } else {
+            res.send(result);
         }
-
-        //res.render('youtube', { user: req.user });
-        res.send(response);
     });
+
 
     // WORKING GOOGLE PLUS PART. DON'T REMOVE!
 /*
