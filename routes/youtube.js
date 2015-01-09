@@ -5,15 +5,37 @@ var express = require('express'),
     router = express.Router(),
     google = require('googleapis'),
     OAuth2 = google.auth.OAuth2,
-    GoogleInfo = require('./../bin/google-info'),
     YoutubeManager = require('./../js/youtube-manager');
 
+
+router.get('/playlists/', ensureAuthenticated, function(req, res) {
+    var youtubeManager = new YoutubeManager();
+    youtubeManager.MyPlaylists(function(err, result) {
+        if(err) {
+            console.log(err);
+            res.send(err);
+        } else {
+            res.send(result);
+        }
+    });
+});
+
+router.get('/playlist/videos/', ensureAuthenticated, function(req, res) {
+    var youtubeManager = new YoutubeManager();
+    youtubeManager.VideosInPlaylist("PLX0jcZ2eQoOa6AISCWiwNAWSlNVVSup5W", function(err, result) {
+        if(err) {
+            console.log(err);
+            res.send(err);
+        } else {
+            res.send(result);
+        }
+    });
+});
 
 /* GET /youtube/ */
 router.get('/', ensureAuthenticated, function(req, res){
 
-    // Try to connect to youtube here
-    var plus = google.plus('v1');
+
     var oauth2client = new OAuth2();
     console.log("OAuth Client done", oauth2client);
     oauth2client.setCredentials({
@@ -24,32 +46,10 @@ router.get('/', ensureAuthenticated, function(req, res){
     // Set the authentication as global
     google.options({ auth : oauth2client});
 
-    var youtubeManager = new YoutubeManager();
-    //youtubeManager.MyPlaylists(function(err, result) {
-    //youtubeManager.MyVideos(function(err, result) {
-    youtubeManager.VideosInPlaylist("PLX0jcZ2eQoOa6AISCWiwNAWSlNVVSup5W", function(err, result) {
-        if(err) {
-            console.log(err);
-            res.send(err);
-        } else {
-            res.send(result);
-        }
-    });
-
-
-    // WORKING GOOGLE PLUS PART. DON'T REMOVE!
-/*
-    plus.people.get({ userId : "me", auth : oauth2client}, function(err, response) {
-        if (err) {
-            res.json({error : err});
-        }
-
-        //res.render('youtube', { user: req.user });
-        res.send(response);
-    });
-*/
-
+    res.render('youtube');
 });
+
+
 
 // Simple route middleware to ensure user is authenticated.
 //   Use this route middleware on any resource that needs to be protected.  If
