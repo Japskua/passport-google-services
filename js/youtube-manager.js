@@ -45,4 +45,8 @@ YoutubeManager.prototype.MyVideos = function(callback) {
     });
 };
 
+YoutubeManager.prototype.AddVideo = function(callback) {
+
+};
+
 module.exports = YoutubeManager;

@@ -32,6 +32,19 @@ router.get('/playlist/videos/', ensureAuthenticated, function(req, res) {
     });
 });
 
+router.get('/videos/add', ensureAuthenticated, function(req, res) {
+
+    res.render('add-video');
+});
+
+router.post('/video/', ensureAuthenticated, function(req, res) {
+    console.log("Adding video to youtube");
+    var youtubeManager = new YoutubeManager();
+
+
+    res.send("Received POST");
+});
+
 /* GET /youtube/ */
 router.get('/', ensureAuthenticated, function(req, res){
 
