@@ -7,6 +7,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
+var busboy = require('connect-busboy');
 
 var routes = require('./routes/index'),
     users = require('./routes/users'),
@@ -42,6 +43,9 @@ app.use(session({
 // Initialize the passport
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Initialize the busboy
+app.use(busboy());
 
 app.use('/', routes);
 app.use('/users', users);

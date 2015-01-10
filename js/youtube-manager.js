@@ -55,7 +55,6 @@ YoutubeManager.prototype.MyVideos = function(callback) {
  * @constructor
  */
 YoutubeManager.prototype.UploadVideo = function(videoPath, metadata, callback) {
-
     var media = {
         mimeType : 'video/mp4',
         body : fs.readFileSync(videoPath)
@@ -71,8 +70,32 @@ YoutubeManager.prototype.UploadVideo = function(videoPath, metadata, callback) {
             callback(null, result);
         }
     });
+};
 
+/**
+ * Inserts the given video to playlist
+ * @param {String} videoId The ID of the video to add
+ * @param {String} playlistId The ID of the playlist where to add the video
+ * @param {Function} callback Callback function
+ */
+YoutubeManager.prototype.insertToPlaylist = function (videoId, playlistId, callback) {
 
+    // TODO: Change this to work properly!
+
+    // Create the snippet to insert
+    var snippet = { playlistId: playlistId,
+        resourceId: {
+            videoId: videoId,
+            kind: "youtube#video"
+        }};
+
+    // TODO: Commented out, as it does not work!
+    /*
+    client
+        .youtube.playlistItems.insert({ part : "snippet, status"}, { snippet : snippet })
+        .withAuthClient(authClient)
+        .execute(callback);
+        */
 };
 
 

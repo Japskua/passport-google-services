@@ -5,7 +5,9 @@ var express = require('express'),
     router = express.Router(),
     google = require('googleapis'),
     OAuth2 = google.auth.OAuth2,
-    YoutubeManager = require('./../js/youtube-manager');
+    YoutubeManager = require('./../js/youtube-manager'),
+    busboy = require('connect-busboy'),
+    fs = require('fs');
 
 
 router.get('/playlists/', ensureAuthenticated, function(req, res) {
@@ -57,18 +59,51 @@ router.get('/upload/', ensureAuthenticated, function(req, res) {
         }
     });
 
-
-    //res.send("Upload page");
 });
 
 router.post('/video/', ensureAuthenticated, function(req, res) {
     console.log("Adding video to youtube");
     var youtubeManager = new YoutubeManager();
 
-    console.log(req.body);
+    // Initialize the filestream
+    var fstream;
+    // Make a pipe
+    req.pipe(req.busboy);
+    // Then, use busboy to read the file
+    console.log("Starting to work with busboy");
+    //console.log("req.busboy is:", req.busboy);
+    req.busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
+
+        console.log("Getting stuff with the following info", "fieldName:", fieldname, "filename", filename, "encoding:", encoding, "mimetype:", mimetype);
+
+        console.log("Uploading:", filename);
+
+        var path = __dirname + '/../tmp/' + filename;
+
+        console.log("Uploading to:", path);
+
+        // Create writestream for the data
+        fstream = fs.createWriteStream(path);
+
+        // Then, pipe the data to the file stream
+        file.pipe(fstream);
+
+        // And then finally close the file stream
+        fstream.on('close', function(err) {
+            if (err) {
+                res.send(err);
+            }
+
+            // Thins done
+            res.send("Upload done!");
+        })
+    });
 
 
-    res.send("Received POST");
+    //console.log(req.body);
+
+
+    //res.send("Received POST");
 });
 
 /* GET /youtube/ */
