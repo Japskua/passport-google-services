@@ -34,12 +34,38 @@ router.get('/playlist/videos/', ensureAuthenticated, function(req, res) {
 
 router.get('/videos/add', ensureAuthenticated, function(req, res) {
 
+
     res.render('add-video');
+});
+
+router.get('/upload/', ensureAuthenticated, function(req, res) {
+
+    var youtubeManager = new YoutubeManager();
+
+    // Create metadata for the upload
+    var metadata = youtubeManager.CreateMetadata("Test Title",
+                                                 "Test description",
+                                                 "private", // privacy status
+                                                 ["test", "video", "trainer4"]); // tags
+
+    // Then, upload the video
+    youtubeManager.UploadVideo('tmp/video.mp4', metadata, function(err, result) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.send(result);
+        }
+    });
+
+
+    //res.send("Upload page");
 });
 
 router.post('/video/', ensureAuthenticated, function(req, res) {
     console.log("Adding video to youtube");
     var youtubeManager = new YoutubeManager();
+
+    console.log(req.body);
 
 
     res.send("Received POST");
