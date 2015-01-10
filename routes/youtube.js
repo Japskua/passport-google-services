@@ -61,6 +61,17 @@ router.get('/upload/', ensureAuthenticated, function(req, res) {
 
 });
 
+function removeFile(filePath, callback) {
+    // Just remove the file
+    fs.unlink(filePath, function(err) {
+        if(err) {
+            callback(err, null);
+        } else {
+            callback();
+        }
+    });
+}
+
 router.post('/video/', ensureAuthenticated, function(req, res) {
     console.log("Adding video to youtube");
     var youtubeManager = new YoutubeManager();
@@ -94,8 +105,15 @@ router.post('/video/', ensureAuthenticated, function(req, res) {
                 res.send(err);
             }
 
-            // Thins done
-            res.send("Upload done!");
+            // Things done
+            // Remove the file!
+            removeFile(path, function(err) {
+                if (err) {
+                    res.send(err);
+                }
+                res.send("Upload done!");
+            });
+
         })
     });
 
