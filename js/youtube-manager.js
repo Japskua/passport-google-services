@@ -4,12 +4,18 @@
 
 var google = require('googleapis'),
     youtube = google.youtube('v3'),
-    fs = require('fs');
+    fs = require('fs'),
+    _ = require('underscore');
 
 function YoutubeManager () {
 
 }
 
+/**
+ * Lists all of user's own playlists
+ * @param {Function} callback The basic (err, result) callback function
+ * @constructor
+ */
 YoutubeManager.prototype.MyPlaylists = function(callback) {
 
     youtube.playlists.list({ part : "snippet", mine : true}, function(err, result) {
@@ -23,6 +29,12 @@ YoutubeManager.prototype.MyPlaylists = function(callback) {
 
 };
 
+/**
+ * Lists all videos in the given playlist
+ * @param {String} playlistId The playlistID
+ * @param {Function} callback Basic callback function (err, result)
+ * @constructor
+ */
 YoutubeManager.prototype.VideosInPlaylist = function(playlistId, callback) {
 
     youtube.playlistItems.list({ part : "snippet", playlistId : playlistId}, function(err, result) {
@@ -33,6 +45,81 @@ YoutubeManager.prototype.VideosInPlaylist = function(playlistId, callback) {
         callback(null, result);
     });
 
+};
+
+/**
+ * Finds a playlist by the given name, or creates one if it does not exist
+ * @param {String} playlistName Name of the playlist in question
+ * @param {Function} callback Callback function (err, result)
+ * @constructor
+ */
+YoutubeManager.prototype.FindPlaylistOrCreateIfNotExists = function(playlistName, callback) {
+
+    youtube.playlists.list({part: "snippet", mine: true}, function (err, result) {
+        if (err) {
+            callback(err, null);
+        }
+
+        // Okay, we got the list of results
+        // Check the list for match
+
+        var playlist = _.find(result.items, function(item) {
+            if (item.snippet.title === playlistName) {
+                return item.id;
+            }
+        });
+
+        console.log("PlaylistId after search is:", playlist);
+
+        // If we got null or undefined, we need to create the playlist
+        if ((playlist === null) || (playlist === undefined)) {
+            var youtubeManager = new YoutubeManager();
+            youtubeManager.CreatePlaylist(playlistName, playlistName + " video listing", "unlisted", function(err, createResult) {
+                if (err) {
+                    callback(err, null);
+                    return;
+                }
+
+                // Return the playlist
+                callback(null, createResult);
+            })
+        }
+        // Otherwise, just return the found results
+        else {
+            callback(null, playlist);
+        }
+
+
+    });
+};
+
+/**
+ * Creates a playlist with the given details
+ * @param {String} title The title for the playlist
+ * @param {String} description Playlist description
+ * @param {String} privacy The privacy status for the playlist 'public', 'private', 'unlisted'
+ * @param {Function} callback The basic callback function (err, result)
+ * @constructor
+ */
+YoutubeManager.prototype.CreatePlaylist = function(title, description, privacy, callback) {
+    // First, create the resource JSON
+    var resource = {
+        snippet : {
+            title : title,
+            description : description
+        },
+        status : {
+            privacyStatus : privacy
+        }
+    };
+
+    youtube.playlists.insert({ part : "snippet, status", resource : resource}, function(err, result) {
+        if (err) {
+            callback(err, null);
+        } else {
+            callback(null, result);
+        }
+    });
 };
 
 
@@ -92,13 +179,11 @@ YoutubeManager.prototype.UploadVideo = function(videoPath, mimeType, metadata, c
  * Inserts the given video to playlist
  * @param {String} videoId The ID of the video to add
  * @param {String} playlistId The ID of the playlist where to add the video
- * @param {Function} callback Callback function
+ * @param {Function} callback Callback function(err)
  */
 YoutubeManager.prototype.insertToPlaylist = function (videoId, playlistId, callback) {
 
     console.log("Adding to playlist:", playlistId);
-
-    // TODO: Change this to work properly!
 
     // Create the snippet to insert
     var snippet = {

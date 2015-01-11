@@ -22,6 +22,22 @@ router.get('/playlists/', ensureAuthenticated, function(req, res) {
     });
 });
 
+router.post('/playlists/find/', ensureAuthenticated, function(req, res) {
+    var youtubeManager = new YoutubeManager();
+    console.log("Finding playlist with name:", req.body);
+    youtubeManager.FindPlaylistOrCreateIfNotExists(req.body.playlistName, function(err, result) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.send(result);
+        }
+    });
+});
+
+router.get('/playlists/find', ensureAuthenticated, function(req, res) {
+    res.render('playlists-find');
+});
+
 router.get('/playlist/videos/', ensureAuthenticated, function(req, res) {
     var youtubeManager = new YoutubeManager();
     youtubeManager.VideosInPlaylist("PLX0jcZ2eQoOa6AISCWiwNAWSlNVVSup5W", function(err, result) {
@@ -108,14 +124,13 @@ router.post('/video/', ensureAuthenticated, function(req, res) {
 
             var metadata = youtubeManager.CreateMetadata("Practise Title", "Video Description", "private", ["trainer4"]);
 
-            // TODO: 2. Upload to youtube
+            // 2. Upload to youtube
             youtubeManager.UploadVideo(path, mimetype, metadata, function(err, result) {
                 if (err) {
                     res.send(err);
                     return;
                 }
 
-                // Otherwise, keep on going
                 // 3. Remove the file
                 removeFile(path, function(err) {
                     if (err) {
