@@ -51,7 +51,7 @@ router.get('/upload/', ensureAuthenticated, function(req, res) {
                                                  ["test", "video", "trainer4"]); // tags
 
     // Then, upload the video
-    youtubeManager.UploadVideo('tmp/video.mp4', metadata, function(err, result) {
+    youtubeManager.UploadVideo('tmp/video.mp4', 'video/mp4', metadata, function(err, result) {
         if (err) {
             res.send(err);
         } else {
@@ -103,25 +103,30 @@ router.post('/video/', ensureAuthenticated, function(req, res) {
         fstream.on('close', function(err) {
             if (err) {
                 res.send(err);
+                return;
             }
 
-            // Things done
-            // Remove the file!
-            removeFile(path, function(err) {
+            var metadata = youtubeManager.CreateMetadata("Practise Title", "Video Description", "private", ["trainer4"]);
+
+            // TODO: 2. Upload to youtube
+            youtubeManager.UploadVideo(path, mimetype, metadata, function(err, result) {
                 if (err) {
                     res.send(err);
+                    return;
                 }
-                res.send("Upload done!");
-            });
 
+                // Otherwise, keep on going
+                // 3. Remove the file
+                removeFile(path, function(err) {
+                    if (err) {
+                        res.send(err);
+                        return;
+                    }
+                    res.send("Upload to youtube done!", result);
+                });
+            });
         })
     });
-
-
-    //console.log(req.body);
-
-
-    //res.send("Received POST");
 });
 
 /* GET /youtube/ */

@@ -50,24 +50,40 @@ YoutubeManager.prototype.MyVideos = function(callback) {
 /**
  * Uploads a video to youtube
  * @param {String} videoPath The local filesystem path to the video
+ * @param {String} mimeType The mime type of the file in question
  * @param {Object} metadata Object containing the metadata to be added for the video
  * @param {Function} callback The regular (err, result) callback function
  * @constructor
  */
-YoutubeManager.prototype.UploadVideo = function(videoPath, metadata, callback) {
+YoutubeManager.prototype.UploadVideo = function(videoPath, mimeType, metadata, callback) {
     var media = {
-        mimeType : 'video/mp4',
+        mimeType : mimeType,
         body : fs.readFileSync(videoPath)
     };
 
     youtube.videos.insert({ part : 'snippet, status, player',
                             resource : metadata,
                             media : media},
-                        function(err, result) {
+                        function(err, uploadResult) {
         if (err) {
             callback(err, null)
         } else {
-            callback(null, result);
+
+            var playlistId = "PLX0jcZ2eQoOa6AISCWiwNAWSlNVVSup5W";
+
+            console.log("Video ID is:", uploadResult.id);
+
+            var youtubeManager = new YoutubeManager();
+            // Okay, now we need to set it to the proper play list
+            youtubeManager.insertToPlaylist(uploadResult.id, playlistId, function(err) {
+                if(err) {
+                    callback(err, null);
+                } else {
+                    // Otherwise, pushing to the proper playlist succeeded
+                    // Return the upload results
+                    callback(null, uploadResult);
+                }
+            });
         }
     });
 };
@@ -80,22 +96,33 @@ YoutubeManager.prototype.UploadVideo = function(videoPath, metadata, callback) {
  */
 YoutubeManager.prototype.insertToPlaylist = function (videoId, playlistId, callback) {
 
+    console.log("Adding to playlist:", playlistId);
+
     // TODO: Change this to work properly!
 
     // Create the snippet to insert
-    var snippet = { playlistId: playlistId,
+    var snippet = {
+        playlistId: playlistId,
         resourceId: {
             videoId: videoId,
             kind: "youtube#video"
         }};
 
-    // TODO: Commented out, as it does not work!
-    /*
-    client
-        .youtube.playlistItems.insert({ part : "snippet, status"}, { snippet : snippet })
-        .withAuthClient(authClient)
-        .execute(callback);
-        */
+    var params = {
+        part : "snippet",
+        resource : {
+            snippet : snippet
+        }
+    };
+
+    youtube.playlistItems.insert(params, function(err, result) {
+        if(err) {
+            callback(err);
+        } else {
+            callback();
+        }
+
+    });
 };
 
 
