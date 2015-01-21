@@ -15,7 +15,8 @@ var routes = require('./routes/index'),
     loginRoute = require('./routes/login'),
     logoutRoute = require('./routes/logout'),
     accountRoute = require('./routes/account'),
-    authRoute = require('./routes/auth');
+    authRoute = require('./routes/auth'),
+    drive = require('./routes/drive');
 
 var app = express();
 
@@ -54,6 +55,7 @@ app.use('/account', accountRoute);
 app.use('/login', loginRoute);
 app.use('/logout', logoutRoute);
 app.use('/auth', authRoute);
+app.use('/drive', drive);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
