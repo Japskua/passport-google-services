@@ -4,9 +4,24 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET users listing. */
+/* GET /drive/ */
 router.get('/', ensureAuthenticated, function(req, res) {
     res.render('drive', { user : req.user});
+});
+
+/* GET /drive/example1 */
+router.get('/example1', ensureAuthenticated, function(req, res) {
+    res.render('example1', {user : req.user});
+});
+
+/* GET /drive/example2 */
+router.get('/example2', ensureAuthenticated, function(req, res) {
+    res.render('example2', {user : req.user});
+});
+
+/* GET /drive/example3 */
+router.get('/example3', ensureAuthenticated, function(req, res) {
+    res.render('example3', {user : req.user});
 });
 
 // Simple route middleware to ensure user is authenticated.
