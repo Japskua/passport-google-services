@@ -59,7 +59,7 @@
 
                 var picker = new google.picker.PickerBuilder().
                     //addView(google.picker.ViewId.PHOTOS).
-                        addView(view).
+                        addView(view.setQuery('smiley')).
                         addView(uploadView).
                         setOAuthToken(oauthToken).
                         setDeveloperKey(developerKey).

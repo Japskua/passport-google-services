@@ -53,15 +53,25 @@
         // Create and render a Picker object for searching images.
         function createPicker() {
             if (pickerApiLoaded && oauthToken) {
-                var view = new google.picker.View(google.picker.ViewId.DOCS);
-                view.setMimeTypes("image/png,image/jpeg,image/jpg");
+               // var view = new google.picker.View(google.picker.ViewId.DOCS);
+                var view = new google.picker.View(google.picker.ViewId.FOLDERS);
+                view.setMimeTypes("image/png,image/jpeg,image/jpg,application/pdf");
+
+                /* Define the upload view here */
+                var uploadView = new google.picker.DocsUploadView();
+                uploadView.setIncludeFolders(true);
+
+
                 var picker = new google.picker.PickerBuilder()
-                        .enableFeature(google.picker.Feature.NAV_HIDDEN)
+                        //.enableFeature(google.picker.Feature.NAV_HIDDEN)
+                        .enableFeature(google.picker.Feature.MINE_ONLY)
                         .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+                        .setLocale('fi')
                         .setAppId(appId)
                         .setOAuthToken(oauthToken)
                         .addView(view)
-                        .addView(new google.picker.DocsUploadView())
+                        //.addView(new google.picker.DocsUploadView())
+                        .addView(uploadView)
                         .setDeveloperKey(developerKey)
                         .setCallback(pickerCallback)
                         .build();
